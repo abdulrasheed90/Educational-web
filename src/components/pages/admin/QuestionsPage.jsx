@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import AdminLayout from '../../admin/AdminLayout';
 import RichTextEditor from '../../admin/RichTextEditor';
 import { getAllQuestions, createQuestion, updateQuestion, deleteQuestion } from '../../../services/adminService';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState([]);
@@ -15,6 +16,7 @@ export default function QuestionsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
+  const { confirm, ConfirmComponent } = useConfirm();
   const [formData, setFormData] = useState({
     questionText: '',
     options: [
@@ -43,12 +45,12 @@ export default function QuestionsPage() {
   const fetchQuestions = async () => {
     try {
       setLoading(true);
-      const response = await getAllQuestions({ 
-        page, 
-        limit: 10, 
-        search, 
+      const response = await getAllQuestions({
+        page,
+        limit: 10,
+        search,
         subject: subjectFilter,
-        difficulty: difficultyFilter 
+        difficulty: difficultyFilter
       });
       if (response.success) {
         setQuestions(response.data.questions);
@@ -63,7 +65,7 @@ export default function QuestionsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     const hasCorrectAnswer = formData.options.some(opt => opt.isCorrect);
     if (!hasCorrectAnswer) {
@@ -88,7 +90,12 @@ export default function QuestionsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this question?')) {
+    const confirmed = await new Promise((resolve) => {
+      const shouldDelete = window.confirm('Are you sure you want to delete this question?');
+      resolve(shouldDelete);
+    });
+    
+    if (confirmed) {
       try {
         await deleteQuestion(id);
         toast.success('Question deleted successfully');
@@ -149,7 +156,7 @@ export default function QuestionsPage() {
   const updateOption = (index, field, value) => {
     const newOptions = [...formData.options];
     newOptions[index][field] = value;
-    
+
     // If marking as correct, unmark others
     if (field === 'isCorrect' && value) {
       newOptions.forEach((opt, idx) => {
@@ -180,7 +187,7 @@ export default function QuestionsPage() {
           </div>
           <button
             onClick={() => { resetForm(); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Question
@@ -235,23 +242,22 @@ export default function QuestionsPage() {
             questions.map((question, idx) => (
               <div
                 key={question._id}
-                className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all"
+                className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex gap-3 flex-1">
-                    <div className="w-10 h-10 rounded-full bg-[#2F6FED]/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#2F6FED] font-bold">{(page - 1) * 10 + idx + 1}</span>
+                    <div className="w-10 h-10 rounded-full bg-[#06b5cc]/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[#06b5cc] font-bold">{(page - 1) * 10 + idx + 1}</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex flex-wrap gap-2 mb-2">
-                        <span className="px-2 py-1 rounded text-xs bg-blue-500/10 text-blue-400 capitalize">
+                        <span className="px-2 py-1 rounded text-xs bg-[#06b5cc]/10 text-[#06b5cc] capitalize">
                           {question.subject.replace('-', ' ')}
                         </span>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          question.difficulty === 'easy' ? 'bg-green-500/10 text-green-400' :
+                        <span className={`px-2 py-1 rounded text-xs ${question.difficulty === 'easy' ? 'bg-green-500/10 text-green-400' :
                           question.difficulty === 'medium' ? 'bg-yellow-500/10 text-yellow-400' :
-                          'bg-red-500/10 text-red-400'
-                        }`}>
+                            'bg-red-500/10 text-red-400'
+                          }`}>
                           {question.difficulty}
                         </span>
                         <span className="px-2 py-1 rounded text-xs bg-gray-500/10 text-gray-400">
@@ -266,13 +272,12 @@ export default function QuestionsPage() {
                       <p className="text-white font-medium mb-3">{question.questionText}</p>
                       <div className="space-y-2">
                         {question.options?.map((option, optIdx) => (
-                          <div 
+                          <div
                             key={optIdx}
-                            className={`p-3 rounded-lg border ${
-                              option.isCorrect 
-                                ? 'border-green-500/30 bg-green-500/5' 
-                                : 'border-white/5 bg-white/5'
-                            }`}
+                            className={`p-3 rounded-lg border ${option.isCorrect
+                              ? 'border-green-500/30 bg-green-500/5'
+                              : 'border-white/5 bg-white/5'
+                              }`}
                           >
                             <div className="flex items-center gap-2">
                               <span className="text-[#94A3B8]">{String.fromCharCode(65 + optIdx)}.</span>
@@ -293,7 +298,7 @@ export default function QuestionsPage() {
                       onClick={() => openEditModal(question)}
                       className="p-2 hover:bg-white/5 rounded-lg transition-colors"
                     >
-                      <Edit className="w-4 h-4 text-blue-400" />
+                      <Edit className="w-4 h-4 text-[#06b5cc]" />
                     </button>
                     <button
                       onClick={() => handleDelete(question._id)}
@@ -333,7 +338,7 @@ export default function QuestionsPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
+          <div className="bg-gradient-to-br from-[#111113] to-[#111113]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
                 {editingQuestion ? 'Edit Question' : 'Add New Question'}
@@ -350,7 +355,7 @@ export default function QuestionsPage() {
                   <select
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     {subjects.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -363,7 +368,7 @@ export default function QuestionsPage() {
                   <select
                     value={formData.class}
                     onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="9th">9th</option>
                     <option value="10th">10th</option>
@@ -380,7 +385,7 @@ export default function QuestionsPage() {
                     onChange={(e) => setFormData({ ...formData, chapter: parseInt(e.target.value) })}
                     required
                     min="1"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
 
@@ -389,7 +394,7 @@ export default function QuestionsPage() {
                   <select
                     value={formData.difficulty}
                     onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
@@ -405,7 +410,7 @@ export default function QuestionsPage() {
                     onChange={(e) => setFormData({ ...formData, marks: parseInt(e.target.value) })}
                     required
                     min="1"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
 
@@ -414,7 +419,7 @@ export default function QuestionsPage() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="mcq">MCQ</option>
                     <option value="true-false">True/False</option>
@@ -449,7 +454,7 @@ export default function QuestionsPage() {
                         onChange={(e) => updateOption(idx, 'text', e.target.value)}
                         required
                         placeholder={`Option ${String.fromCharCode(65 + idx)}`}
-                        className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                        className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                       />
                     </div>
                   ))}
@@ -472,7 +477,7 @@ export default function QuestionsPage() {
                   onChange={(e) => setFormData({ ...formData, hint: e.target.value })}
                   rows="2"
                   placeholder="Give students a hint..."
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -507,7 +512,7 @@ export default function QuestionsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
                 >
                   {editingQuestion ? 'Update Question' : 'Create Question'}
                 </button>
@@ -516,6 +521,7 @@ export default function QuestionsPage() {
           </div>
         </div>
       )}
+      <ConfirmComponent />
     </AdminLayout>
   );
 }

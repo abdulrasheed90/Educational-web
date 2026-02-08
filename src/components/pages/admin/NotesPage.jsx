@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import AdminLayout from '../../admin/AdminLayout';
 import RichTextEditor from '../../admin/RichTextEditor';
 import { getAllNotes, createNote, updateNote, deleteNote } from '../../../services/adminService';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export default function NotesPage() {
   const [notes, setNotes] = useState([]);
@@ -28,6 +29,7 @@ export default function NotesPage() {
     isVisible: true
   });
   const [tagInput, setTagInput] = useState('');
+  const { confirm, ConfirmComponent } = useConfirm();
 
   useEffect(() => {
     fetchNotes();
@@ -36,12 +38,12 @@ export default function NotesPage() {
   const fetchNotes = async () => {
     try {
       setLoading(true);
-      const response = await getAllNotes({ 
-        page, 
-        limit: 10, 
-        search, 
+      const response = await getAllNotes({
+        page,
+        limit: 10,
+        search,
         subject: subjectFilter,
-        type: typeFilter 
+        type: typeFilter
       });
       if (response.success) {
         setNotes(response.data.notes);
@@ -73,12 +75,19 @@ export default function NotesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this note?')) {
-      try {
-        await deleteNote(id);
-        toast.success('Note deleted successfully');
-        fetchNotes();
-      } catch (error) {
+    try {
+      await confirm({
+        title: 'Delete Note',
+        message: 'Are you sure you want to delete this note?',
+        variant: 'danger',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      await deleteNote(id);
+      toast.success('Note deleted successfully');
+      fetchNotes();
+    } catch (error) {
+      if (error !== false) {
         toast.error('Failed to delete note');
       }
     }
@@ -157,7 +166,7 @@ export default function NotesPage() {
           </div>
           <button
             onClick={() => { resetForm(); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Note
@@ -212,16 +221,16 @@ export default function NotesPage() {
             notes.map((note) => (
               <div
                 key={note._id}
-                className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all"
+                className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <FileText className="w-8 h-8 text-[#2F6FED]" />
+                  <FileText className="w-8 h-8 text-[#06b5cc]" />
                   <div className="flex gap-2">
                     <button
                       onClick={() => openEditModal(note)}
                       className="p-2 hover:bg-white/5 rounded-lg transition-colors"
                     >
-                      <Edit className="w-4 h-4 text-blue-400" />
+                      <Edit className="w-4 h-4 text-[#06b5cc]" />
                     </button>
                     <button
                       onClick={() => handleDelete(note._id)}
@@ -233,13 +242,13 @@ export default function NotesPage() {
                 </div>
 
                 <h3 className="text-lg font-bold text-white mb-2">{note.title}</h3>
-                
+
                 {note.summary && (
                   <p className="text-[#94A3B8] text-sm mb-3 line-clamp-2">{note.summary}</p>
                 )}
 
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="px-2 py-1 rounded text-xs bg-blue-500/10 text-blue-400 capitalize">
+                  <span className="px-2 py-1 rounded text-xs bg-[#06b5cc]/10 text-[#06b5cc] capitalize">
                     {note.subject.replace('-', ' ')}
                   </span>
                   <span className="px-2 py-1 rounded text-xs bg-purple-500/10 text-purple-400 capitalize">
@@ -299,7 +308,7 @@ export default function NotesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
+          <div className="bg-gradient-to-br from-[#111113] to-[#111113]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
                 {editingNote ? 'Edit Note' : 'Add New Note'}
@@ -318,7 +327,7 @@ export default function NotesPage() {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     required
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
 
@@ -327,7 +336,7 @@ export default function NotesPage() {
                   <select
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     {subjects.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -340,7 +349,7 @@ export default function NotesPage() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     {noteTypes.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -353,7 +362,7 @@ export default function NotesPage() {
                   <select
                     value={formData.class}
                     onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="9th">9th</option>
                     <option value="10th">10th</option>
@@ -370,7 +379,7 @@ export default function NotesPage() {
                     onChange={(e) => setFormData({ ...formData, chapter: parseInt(e.target.value) })}
                     required
                     min="1"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
               </div>
@@ -382,7 +391,7 @@ export default function NotesPage() {
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   rows="2"
                   placeholder="Brief summary or preview..."
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -404,7 +413,7 @@ export default function NotesPage() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="Add tag and press Enter"
-                    className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                   <button
                     type="button"
@@ -418,7 +427,7 @@ export default function NotesPage() {
                   {formData.tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-[#2F6FED]/10 text-[#2F6FED] rounded-full text-sm flex items-center gap-2"
+                      className="px-3 py-1 bg-[#06b5cc]/10 text-[#06b5cc] rounded-full text-sm flex items-center gap-2"
                     >
                       #{tag}
                       <button
@@ -464,7 +473,7 @@ export default function NotesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
                 >
                   {editingNote ? 'Update Note' : 'Create Note'}
                 </button>
@@ -473,6 +482,7 @@ export default function NotesPage() {
           </div>
         </div>
       )}
+      <ConfirmComponent />
     </AdminLayout>
   );
 }

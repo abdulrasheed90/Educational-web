@@ -13,6 +13,7 @@ export default function ImagesPage() {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
+  const { confirm, ConfirmComponent } = useConfirm();
 
   useEffect(() => {
     fetchImages();
@@ -68,7 +69,7 @@ export default function ImagesPage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileUpload(e.dataTransfer.files);
     }
@@ -96,12 +97,19 @@ export default function ImagesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this image?')) {
-      try {
-        await deleteImage(id);
-        toast.success('Image deleted');
-        fetchImages();
-      } catch (error) {
+    try {
+      await confirm({
+        title: 'Delete Image',
+        message: 'Are you sure you want to delete this image?',
+        variant: 'danger',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      await deleteImage(id);
+      toast.success('Image deleted');
+      fetchImages();
+    } catch (error) {
+      if (error !== false) {
         toast.error('Failed to delete image');
       }
     }
@@ -124,11 +132,10 @@ export default function ImagesPage() {
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-8 transition-all ${
-            dragActive 
-              ? 'border-[#2F6FED] bg-[#2F6FED]/10' 
-              : 'border-white/20 bg-white/5 hover:border-white/30'
-          }`}
+          className={`relative border-2 border-dashed rounded-2xl p-8 transition-all ${dragActive
+            ? 'border-[#06b5cc] bg-[#06b5cc]/10'
+            : 'border-white/20 bg-white/5 hover:border-white/30'
+            }`}
         >
           <input
             ref={fileInputRef}
@@ -137,10 +144,10 @@ export default function ImagesPage() {
             onChange={(e) => handleFileUpload(e.target.files)}
             className="hidden"
           />
-          
+
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#2F6FED]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-[#2F6FED]" />
+            <div className="w-16 h-16 bg-[#06b5cc]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="w-8 h-8 text-[#06b5cc]" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">
               {uploading ? 'Uploading...' : 'Drop images here or click to upload'}
@@ -151,7 +158,7 @@ export default function ImagesPage() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="px-6 py-3 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors disabled:opacity-50"
             >
               {uploading ? 'Uploading...' : 'Select Files'}
             </button>
@@ -186,7 +193,7 @@ export default function ImagesPage() {
             images.map((image) => (
               <div
                 key={image._id}
-                className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all group"
+                className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all group"
               >
                 {/* Image Preview */}
                 <div className="relative aspect-square bg-white/5 overflow-hidden">
@@ -198,14 +205,13 @@ export default function ImagesPage() {
                       e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23333" width="100" height="100"/%3E%3Ctext fill="%23666" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
                     }}
                   />
-                  
+
                   {/* Status Badge */}
                   <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      image.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${image.status === 'approved' ? 'bg-green-500/20 text-green-400' :
                       image.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
-                      'bg-yellow-500/20 text-yellow-400'
-                    }`}>
+                        'bg-yellow-500/20 text-yellow-400'
+                      }`}>
                       {image.status}
                     </span>
                   </div>

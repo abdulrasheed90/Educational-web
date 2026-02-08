@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      // Auth initialization error - handled by logout
       await logout();
     } finally {
       setLoading(false);

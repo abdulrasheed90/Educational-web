@@ -232,6 +232,58 @@ export const setDefaultAIProvider = async (provider) => {
   return response.data;
 };
 
+// ==================== SUBJECTS ====================
+export const getAllSubjects = async () => {
+  const response = await api.get('/admin/subjects');
+  return response.data;
+};
+
+export const getSubjectById = async (id) => {
+  const response = await api.get(`/admin/subjects/${id}`);
+  return response.data;
+};
+
+export const createSubject = async (subjectData) => {
+  const response = await api.post('/admin/subjects', subjectData);
+  return response.data;
+};
+
+export const updateSubject = async (id, subjectData) => {
+  const response = await api.put(`/admin/subjects/${id}`, subjectData);
+  return response.data;
+};
+
+export const deleteSubject = async (id) => {
+  const response = await api.delete(`/admin/subjects/${id}`);
+  return response.data;
+};
+
+// ==================== SECTIONS ====================
+export const getAllSections = async () => {
+  const response = await api.get('/admin/sections');
+  return response.data;
+};
+
+export const getSectionById = async (id) => {
+  const response = await api.get(`/admin/sections/${id}`);
+  return response.data;
+};
+
+export const createSection = async (sectionData) => {
+  const response = await api.post('/admin/sections', sectionData);
+  return response.data;
+};
+
+export const updateSection = async (id, sectionData) => {
+  const response = await api.put(`/admin/sections/${id}`, sectionData);
+  return response.data;
+};
+
+export const deleteSection = async (id) => {
+  const response = await api.delete(`/admin/sections/${id}`);
+  return response.data;
+};
+
 export default {
   // Dashboard
   getDashboardStats,
@@ -283,6 +335,18 @@ export default {
   upsertAIConfig,
   deleteAIConfig,
   toggleAIProvider,
-  setDefaultAIProvider
+  setDefaultAIProvider,
+  // Subjects
+  getAllSubjects,
+  getSubjectById,
+  createSubject,
+  updateSubject,
+  deleteSubject,
+  // Sections
+  getAllSections,
+  getSectionById,
+  createSection,
+  updateSection,
+  deleteSection
 };
 

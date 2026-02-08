@@ -1,13 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
-  FileText, 
-  HelpCircle, 
-  Image, 
-  DollarSign, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  BookOpen,
+  FileText,
+  HelpCircle,
+  Image,
+  DollarSign,
+  Settings,
   Bot,
   X,
   LogOut
@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: Users, label: 'Users', path: '/admin/users' },
+  { icon: GraduationCap, label: 'Subjects', path: '/admin/subjects' },
   { icon: BookOpen, label: 'Lessons', path: '/admin/lessons' },
   { icon: FileText, label: 'Notes', path: '/admin/notes' },
   { icon: HelpCircle, label: 'Questions', path: '/admin/questions' },
@@ -53,7 +54,7 @@ export default function AdminSidebar({ isOpen, onClose, isHovered, onHover, onLe
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
         className={`
-          fixed top-0 left-0 h-full bg-[#1F324D]
+          fixed top-0 left-0 h-full bg-[#111113]
           border-r border-white/10 z-50 transition-all duration-300 ease-in-out
           overflow-hidden
           ${isExpanded ? 'w-64' : 'w-20'}
@@ -95,10 +96,9 @@ export default function AdminSidebar({ isOpen, onClose, isHovered, onHover, onLe
                     className={`
                       flex items-center rounded-lg
                       transition-all duration-200
-                      ${
-                        active
-                          ? 'bg-[#2F6FED] text-white'
-                          : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
+                      ${active
+                        ? 'bg-[#06b5cc] text-white'
+                        : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
                       }
                       ${isExpanded ? 'gap-3 px-4 py-3' : 'justify-center py-3'}
                     `}
@@ -121,7 +121,7 @@ export default function AdminSidebar({ isOpen, onClose, isHovered, onHover, onLe
             {isExpanded ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-3 px-3 py-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2F6FED] to-[#A9C7FF] flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#11282b] to-[#06b5cc] flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">
                       {user?.name?.charAt(0)?.toUpperCase() || 'A'}
                     </span>
@@ -147,7 +147,7 @@ export default function AdminSidebar({ isOpen, onClose, isHovered, onHover, onLe
               </div>
             ) : (
               <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2F6FED] to-[#A9C7FF] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#11282b] to-[#06b5cc] flex items-center justify-center">
                   <span className="text-white text-xs font-bold">
                     {user?.name?.charAt(0)?.toUpperCase() || 'A'}
                   </span>

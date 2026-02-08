@@ -1,4 +1,5 @@
 import api from '../config/api';
+import logger from '../utils/logger';
 
 // Signup
 export const signup = async (name, email, password) => {
@@ -55,7 +56,7 @@ export const logout = async () => {
   try {
     await api.post('/auth/logout');
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error:', error);
   } finally {
     // Clear local storage
     localStorage.removeItem('accessToken');

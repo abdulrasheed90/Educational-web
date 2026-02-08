@@ -10,41 +10,41 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
       container: [
         // Headers
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        
+
         // Font styles
         [{ font: [] }],
         [{ size: ['small', false, 'large', 'huge'] }],
-        
+
         // Text formatting
         ['bold', 'italic', 'underline', 'strike'],
-        
+
         // Colors
         [{ color: [] }, { background: [] }],
-        
+
         // Lists
         [{ list: 'ordered' }, { list: 'bullet' }],
         [{ indent: '-1' }, { indent: '+1' }],
-        
+
         // Text alignment
         [{ align: [] }],
-        
+
         // Scripts (superscript/subscript)
         [{ script: 'sub' }, { script: 'super' }],
-        
+
         // Math formula (LaTeX support)
         ['formula'],
-        
+
         // Blockquote and code block
         ['blockquote', 'code-block'],
-        
+
         // Links and media
         ['link', 'image', 'video'],
-        
+
         // Clear formatting
         ['clean']
       ]
     },
-    
+
     // Clipboard module for better paste handling
     clipboard: {
       matchVisual: false
@@ -78,7 +78,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
           minHeight: '300px'
         }}
       />
-      
+
       {/* Custom Styles */}
       <style jsx global>{`
         /* Editor Container */
@@ -106,7 +106,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         .rich-text-editor .ql-toolbar button:hover,
         .rich-text-editor .ql-toolbar button.ql-active {
-          color: #2F6FED;
+          color: #06b5cc;
           background: rgba(47, 111, 237, 0.1);
           border-radius: 6px;
         }
@@ -117,7 +117,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         .rich-text-editor .ql-toolbar button:hover .ql-stroke,
         .rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
-          stroke: #2F6FED;
+          stroke: #06b5cc;
         }
 
         .rich-text-editor .ql-toolbar .ql-fill {
@@ -126,7 +126,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         .rich-text-editor .ql-toolbar button:hover .ql-fill,
         .rich-text-editor .ql-toolbar button.ql-active .ql-fill {
-          fill: #2F6FED;
+          fill: #06b5cc;
         }
 
         /* Editor Content Area */
@@ -178,18 +178,18 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         /* Links */
         .rich-text-editor .ql-editor a {
-          color: #2F6FED;
+          color: #06b5cc;
           text-decoration: underline;
         }
 
         .rich-text-editor .ql-editor a:hover {
-          color: #A9C7FF;
+          color: #EADADA;
         }
 
         /* Code blocks */
         .rich-text-editor .ql-editor pre.ql-syntax {
           background: rgba(0, 0, 0, 0.3);
-          color: #A9C7FF;
+          color: #EADADA;
           border-radius: 8px;
           padding: 12px;
           overflow-x: auto;
@@ -198,7 +198,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         /* Blockquotes */
         .rich-text-editor .ql-editor blockquote {
-          border-left: 4px solid #2F6FED;
+          border-left: 4px solid #06b5cc;
           padding-left: 16px;
           margin: 1em 0;
           color: #94A3B8;
@@ -233,7 +233,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
         }
 
         .rich-text-editor .ql-toolbar .ql-picker-options {
-          background: #0B1D34;
+          background: #111113;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           padding: 4px;
@@ -248,7 +248,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Write s
 
         .rich-text-editor .ql-toolbar .ql-picker-item:hover {
           background: rgba(47, 111, 237, 0.1);
-          color: #2F6FED;
+          color: #06b5cc;
         }
 
         /* Scrollbar */

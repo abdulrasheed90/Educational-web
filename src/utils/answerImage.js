@@ -22,8 +22,8 @@ export function answerTextToImage(text) {
     .join("");
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${BASE_WIDTH}" height="${height}">
-    <rect width="100%" height="100%" rx="24" fill="#04070c" stroke="#2F6FED" stroke-width="3"/>
-    <text font-family="Inter, Arial, sans-serif" font-size="20" fill="#A9C7FF" y="${PADDING + 20}">
+    <rect width="100%" height="100%" rx="24" fill="#04070c" stroke="#06b5cc" stroke-width="3"/>
+    <text font-family="Inter, Arial, sans-serif" font-size="20" fill="#EADADA" y="${PADDING + 20}">
       ${tspanElements}
     </text>
   </svg>`;

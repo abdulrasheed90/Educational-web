@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import AdminLayout from '../../admin/AdminLayout';
 import RichTextEditor from '../../admin/RichTextEditor';
 import { getAllLessons, createLesson, updateLesson, deleteLesson } from '../../../services/adminService';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export default function LessonsPage() {
   const [lessons, setLessons] = useState([]);
@@ -14,6 +15,7 @@ export default function LessonsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
+  const { confirm, ConfirmComponent } = useConfirm();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -67,12 +69,19 @@ export default function LessonsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this lesson?')) {
-      try {
-        await deleteLesson(id);
-        toast.success('Lesson deleted successfully');
-        fetchLessons();
-      } catch (error) {
+    try {
+      await confirm({
+        title: 'Delete Lesson',
+        message: 'Are you sure you want to delete this lesson?',
+        variant: 'danger',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      await deleteLesson(id);
+      toast.success('Lesson deleted successfully');
+      fetchLessons();
+    } catch (error) {
+      if (error !== false) {
         toast.error('Failed to delete lesson');
       }
     }
@@ -134,7 +143,7 @@ export default function LessonsPage() {
           </div>
           <button
             onClick={() => { resetForm(); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Lesson
@@ -166,7 +175,7 @@ export default function LessonsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-white/5 border-b border-white/10">
@@ -202,7 +211,7 @@ export default function LessonsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 capitalize">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#06b5cc]/10 text-[#06b5cc] border border-[#06b5cc]/20 capitalize">
                           {lesson.subject.replace('-', ' ')}
                         </span>
                       </td>
@@ -226,7 +235,7 @@ export default function LessonsPage() {
                             onClick={() => openEditModal(lesson)}
                             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
                           >
-                            <Edit className="w-4 h-4 text-blue-400" />
+                            <Edit className="w-4 h-4 text-[#06b5cc]" />
                           </button>
                           <button
                             onClick={() => handleDelete(lesson._id)}
@@ -269,7 +278,7 @@ export default function LessonsPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
+          <div className="bg-gradient-to-br from-[#111113] to-[#111113]/90 border border-white/10 rounded-2xl p-6 w-full max-w-4xl my-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
                 {editingLesson ? 'Edit Lesson' : 'Add New Lesson'}
@@ -288,7 +297,7 @@ export default function LessonsPage() {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     required
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
 
@@ -297,7 +306,7 @@ export default function LessonsPage() {
                   <select
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     {subjects.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -310,7 +319,7 @@ export default function LessonsPage() {
                   <select
                     value={formData.class}
                     onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="9th">9th</option>
                     <option value="10th">10th</option>
@@ -327,7 +336,7 @@ export default function LessonsPage() {
                     onChange={(e) => setFormData({ ...formData, chapter: parseInt(e.target.value) })}
                     required
                     min="1"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
 
@@ -336,7 +345,7 @@ export default function LessonsPage() {
                   <select
                     value={formData.difficulty}
                     onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   >
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
@@ -351,7 +360,7 @@ export default function LessonsPage() {
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
                     min="1"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                   />
                 </div>
               </div>
@@ -363,7 +372,7 @@ export default function LessonsPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   required
                   rows="3"
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -374,7 +383,7 @@ export default function LessonsPage() {
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                   placeholder="https://youtube.com/watch?v=..."
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -418,7 +427,7 @@ export default function LessonsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
                 >
                   {editingLesson ? 'Update Lesson' : 'Create Lesson'}
                 </button>
@@ -427,6 +436,7 @@ export default function LessonsPage() {
           </div>
         </div>
       )}
+      <ConfirmComponent />
     </AdminLayout>
   );
 }

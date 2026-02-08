@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "../contexts/AuthContext";
 import Logo from "./Logo";
@@ -11,99 +11,70 @@ export default function Navbar() {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
-  const handleLogout = async () => {
-    await logout();
-    setMobileMenuOpen(false);
-    navigate("/");
-  };
-
+  // Hardcoded standard links as requested
   const navLinks = [
-    { name: "Home", path: "/", sectionId: "home" },
-    { name: "Subjects", path: "/subjects" },
-    { name: "Pricing", path: "/pricing", sectionId: "pricing-plans" },
-    { name: "About", path: "/about" },
-    { name: "Sample Content", path: "/sample-content" },
-    { name: "Refund Policy", path: "/refund-policy" },
-    { name: "Contact Us", path: "/contact" },
+    { label: 'Home', path: '/' },
+    { label: 'Subjects', path: '/subjects' },
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' },
+    { label: 'Pricing', path: '/pricing' },
+    { label: 'Sample Content', path: '/sample-content' }
   ];
 
-  const scrollToSection = (sectionId) => {
-    if (typeof window === "undefined") return;
-    const target = document.getElementById(sectionId);
-    if (target) {
-      const offset = 96;
-      const y =
-        target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({
-        top: y >= 0 ? y : 0,
-        behavior: "smooth",
-      });
-    }
-  };
 
   const handleNavClick = (event, link) => {
-    event.preventDefault();
-
-    if (location.pathname === link.path) {
-      if (link.sectionId) {
-        scrollToSection(link.sectionId);
-      }
-    } else {
-      navigate(link.path, link.sectionId ? { state: { targetSection: link.sectionId } } : undefined);
-    }
-
+    // Normal navigation, no special scroll logic needed for standard routes
+    // unless strictly required. For now, simple navigation.
     setMobileMenuOpen(false);
   };
-  
+
 
   return (
     <>
       <nav
-        className="sticky top-0 z-40 backdrop-blur-lg border-b border-white/20 shadow-lg shadow-black/10 transition-colors"
-        style={{ backgroundColor: "#0B1A2C" }}
+        className="sticky top-0 z-40 transition-all duration-300 shadow-xl py-3 mt-0 md:mt-6"
+        style={{
+          backgroundColor: '#000000ee'
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 md:h-18">
             {/* Logo */}
             <Link
               to="/"
-              className="flex items-center justify-center rounded-xl bg-[#163162] px-2 py-1 md:px-3 md:py-2"
+              className="flex items-center justify-center py-1 md:py-2"
             >
-              <Logo className="w-18 h-12 md:w-16 md:h-16" />
+              <Logo className="w-32 h-14 md:w-40 md:h-20" />
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <Link
-                  key={link.name}
+                  key={link.path}
                   to={link.path}
-                  onClick={(event) => handleNavClick(event, link)}
-                  className="text-[#94A3B8] hover:text-white transition-colors"
+                  className={`text-sm font-medium transition-colors ${location.pathname === link.path
+                    ? 'text-white'
+                    : 'text-[#94A3B8] hover:text-white'
+                    }`}
                 >
-                  {link.name}
+                  {link.label}
                 </Link>
               ))}
               {user ? (
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/profile"
-                    className="flex items-center space-x-2 text-[#94A3B8] hover:text-white transition-colors"
+                    className="flex items-center space-x-2 text-white hover:text-white/80 transition-colors"
                   >
-                    <User className="w-5 h-5" />
+                    <User className="w-5 h-5 text-white" />
                     <span>{user.name}</span>
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="text-[#94A3B8] hover:text-white transition-colors"
-                  >
-                    Logout
-                  </button>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="px-6 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-lg transition-colors"
+                  className="px-6 py-2 btn-orange rounded-lg transition-colors"
                 >
                   Login
                 </Link>
@@ -144,14 +115,14 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-80 bg-[#D0E1FF]/95 border-l border-white/10 z-50 md:hidden overflow-y-auto"
+              className="fixed top-0 right-0 bottom-0 w-80 bg-[#111113]/95 border-l border-white/10 z-50 md:hidden overflow-y-auto"
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-8">
-                  <span className="tracking-wide">Menu</span>
+                  <span className="tracking-wide text-white">Menu</span>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -160,12 +131,15 @@ export default function Navbar() {
                 <div className="space-y-4">
                   {navLinks.map((link) => (
                     <Link
-                      key={link.name}
+                      key={link.path}
                       to={link.path}
-                      onClick={(event) => handleNavClick(event, link)}
-                      className="block px-4 py-3 rounded-lg text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`block px-4 py-3 rounded-lg transition-colors ${location.pathname === link.path
+                        ? 'bg-primary-gradient text-white'
+                        : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                        }`}
                     >
-                      {link.name}
+                      {link.label}
                     </Link>
                   ))}
 
@@ -180,26 +154,20 @@ export default function Navbar() {
                           <User className="w-5 h-5" />
                           <span>{user.name}</span>
                         </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left px-4 py-3 rounded-lg text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          Logout
-                        </button>
                       </>
                     ) : (
                       <>
                         <Link
                           to="/login"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="block px-4 py-3 rounded-lg bg-[#2F6FED] hover:bg-[#2F6FED]/80 text-center transition-colors mb-2"
+                          className="block px-4 py-3 rounded-lg btn-orange text-center transition-colors mb-2"
                         >
                           Login
                         </Link>
                         <Link
                           to="/signup"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="block px-4 py-3 rounded-lg border border-[#2F6FED] hover:bg-[#2F6FED]/10 text-center transition-colors"
+                          className="block px-4 py-3 rounded-lg border border-primary-cyan hover:bg-[#06b5cc]/10 text-center transition-colors"
                         >
                           Sign Up
                         </Link>
@@ -211,7 +179,7 @@ export default function Navbar() {
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence >
     </>
   );
 }

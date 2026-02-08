@@ -1,10 +1,20 @@
 import { motion } from 'motion/react';
 import { BookOpen, Target, Award, Users } from 'lucide-react';
+import { useSettings } from '../../contexts/SettingsContext';
+import * as LucideIcons from 'lucide-react';
 
 export default function AboutPage() {
+  const { settings } = useSettings();
+
+  // Get feature cards from settings - NO FALLBACKS
+  const featureCards = (settings.about?.featureCards || []).map(card => {
+    const IconComponent = LucideIcons[card.icon] || BookOpen;
+    return { ...card, IconComponent };
+  }).filter(card => card.title || card.description); // Only show cards with content
+
   return (
-    <div className="min-h-screen py-20 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen py-8 md:py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -12,118 +22,117 @@ export default function AboutPage() {
         >
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#2F6FED]/20 to-[#A9C7FF]/20 rounded-2xl mb-6">
-              <BookOpen className="w-10 h-10 text-[#2F6FED]" />
+            <div className="inline-flex h-8 items-center gap-3 px-6 py-2.5 bg-[#06b5cc]/10 border border-[#06b5cc]/20 rounded-full mb-8 mx-auto mt-4 hover:bg-[#06b5cc]/15 transition-colors duration-300">
+              <BookOpen className="w-6 h-6 text-[#06b5cc]" />
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#06b5cc]">Know Our Story</span>
             </div>
-            <h1 className="mb-4">About StudySouq</h1>
-            <p className="text-[#94A3B8]">Your Personal AI Mathematics Tutor</p>
+            {settings.about?.title ? (
+              <h1 className="mb-4 text-gradient-cyan">{settings.about.title}</h1>
+            ) : (
+              <div className="mb-4 bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 text-center">
+                <p className="text-[#94A3B8]">About page title is not configured. Please add this content from the admin dashboard.</p>
+              </div>
+            )}
+            {settings.about?.subtitle ? (
+              <p className="text-[#94A3B8]">{settings.about.subtitle}</p>
+            ) : (
+              <p className="text-[#94A3B8] italic">About page subtitle is not configured. Please add this content from the admin dashboard.</p>
+            )}
           </div>
 
           {/* Content */}
-          <div className="max-w-4xl mx-auto p-6 space-y-4">
-            <section className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-2xl font-semibold mb-4 text-[#A9C7FF]">Who We Are</h2>
-              <p className="text-[#94A3B8] leading-relaxed mb-4">
-                StudySouq is an AI-powered educational platform designed for IGCSE, AS Level, and A2 Edexcel Mathematics students in Egypt.
-              </p>
-              <p className="text-[#94A3B8] leading-relaxed">
-                Our mission is to provide personalized, adaptive learning that helps every student understand concepts faster, improve through practice, and perform confidently in exams.
-              </p>
-            </section>
+          <div className="max-w-none p-0 md:p-6 space-y-4 md:space-y-6">
+            {settings.about?.whoWeAre ? (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">Who We Are</h2>
+                <p className="text-[#94A3B8] leading-relaxed whitespace-pre-line">
+                  {settings.about.whoWeAre}
+                </p>
+              </section>
+            ) : (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">Who We Are</h2>
+                <p className="text-[#94A3B8] leading-relaxed italic">
+                  "Who We Are" content is not configured. Please add this content from the admin dashboard.
+                </p>
+              </section>
+            )}
 
-            <section className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-2xl font-semibold mb-4 text-[#A9C7FF]">What We Offer</h2>
-              <p className="text-[#94A3B8] leading-relaxed mb-4">Our platform combines:</p>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="text-[#2F6FED] mt-1">•</span>
-                  <span className="text-[#94A3B8]">High-quality study materials</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[#2F6FED] mt-1">•</span>
-                  <span className="text-[#94A3B8]">AI-assisted tutoring</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[#2F6FED] mt-1">•</span>
-                  <span className="text-[#94A3B8]">Topic-based practice questions</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[#2F6FED] mt-1">•</span>
-                  <span className="text-[#94A3B8]">Student progress tracking</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-[#2F6FED] mt-1">•</span>
-                  <span className="text-[#94A3B8]">Smart learning recommendations</span>
-                </div>
-              </div>
-            </section>
+            {settings.about?.whatWeOffer ? (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">What We Offer</h2>
+                <p className="text-[#94A3B8] leading-relaxed whitespace-pre-line">
+                  {settings.about.whatWeOffer}
+                </p>
+              </section>
+            ) : (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">What We Offer</h2>
+                <p className="text-[#94A3B8] leading-relaxed italic">
+                  "What We Offer" content is not configured. Please add this content from the admin dashboard.
+                </p>
+              </section>
+            )}
 
-            <section className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-2xl font-semibold mb-4 text-[#A9C7FF]">Our Commitment</h2>
-              <p className="text-[#94A3B8] leading-relaxed mb-4">
-                StudySouq provides an innovative way for students to learn at their own pace, get instant AI feedback, and strengthen weak areas.
-              </p>
-              <p className="text-[#94A3B8] leading-relaxed">
-                We are committed to making exam preparation easier, smarter, and more effective for every learner.
-              </p>
-            </section>
+            {settings.about?.commitment ? (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">Our Commitment</h2>
+                <p className="text-[#94A3B8] leading-relaxed whitespace-pre-line">
+                  {settings.about.commitment}
+                </p>
+              </section>
+            ) : (
+              <section className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-semibold mb-4 text-[#EADADA]">Our Commitment</h2>
+                <p className="text-[#94A3B8] leading-relaxed italic">
+                  "Our Commitment" content is not configured. Please add this content from the admin dashboard.
+                </p>
+              </section>
+            )}
 
             {/* Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6">
-                <div className="w-12 h-12 bg-[#2F6FED]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Target className="w-6 h-6 text-[#2F6FED]" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Personalized Learning</h3>
-                <p className="text-[#94A3B8] text-sm">
-                  Adaptive content tailored to your learning pace and style
-                </p>
+            {featureCards.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                {featureCards.map((card, index) => {
+                  const Icon = card.IconComponent || BookOpen;
+                  return (
+                    <div key={index} className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6">
+                      <div className="w-12 h-12 bg-[#06b5cc]/20 rounded-xl flex items-center justify-center mb-4">
+                        <Icon className="w-6 h-6 text-[#06b5cc]" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                      <p className="text-[#94A3B8] text-sm">
+                        {card.description}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
-
-              <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6">
-                <div className="w-12 h-12 bg-[#2F6FED]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Award className="w-6 h-6 text-[#2F6FED]" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Exam-Focused</h3>
-                <p className="text-[#94A3B8] text-sm">
-                  Content aligned with Edexcel Mathematics syllabus
-                </p>
+            ) : (
+              <div className="bg-gradient-to-br from-[#111113] to-[#111113]/50 border border-white/10 rounded-2xl p-6 md:p-8 text-center mt-8">
+                <p className="text-[#94A3B8] text-lg mb-2">No feature cards available.</p>
+                <p className="text-[#94A3B8] text-sm">Please add feature cards from the admin dashboard.</p>
               </div>
-
-              <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6">
-                <div className="w-12 h-12 bg-[#2F6FED]/20 rounded-xl flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6 text-[#2F6FED]" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Comprehensive Materials</h3>
-                <p className="text-[#94A3B8] text-sm">
-                  Complete coverage of all topics and learning objectives
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/50 border border-white/10 rounded-2xl p-6">
-                <div className="w-12 h-12 bg-[#2F6FED]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-[#2F6FED]" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">AI Tutor Support</h3>
-                <p className="text-[#94A3B8] text-sm">
-                  Get instant help and guidance whenever you need it
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Call to Action */}
-            <section className="bg-gradient-to-br from-[#2F6FED]/10 to-[#A9C7FF]/10 border border-[#2F6FED]/30 rounded-2xl p-8 text-center mt-8">
+            <section className="bg-gradient-to-br from-[#11282b]/20 to-[#0a1f22]/20 border border-[#06b5cc]/30 rounded-2xl p-6 md:p-8 text-center mt-8 shadow-xl shadow-[#06b5cc]/5">
               <h2 className="text-2xl font-semibold mb-4">Ready to Excel in Mathematics?</h2>
-              <p className="text-[#94A3B8] mb-6">
-                Join thousands of students who are achieving their academic goals with StudySouq
-              </p>
+              {settings.branding?.platformName ? (
+                <p className="text-[#94A3B8] mb-6">
+                  Join thousands of students who are achieving their academic goals with {settings.branding.platformName}
+                </p>
+              ) : (
+                <p className="text-[#94A3B8] mb-6 italic">
+                  Platform name is not configured. Please add platform name from the admin dashboard.
+                </p>
+              )}
               <a
                 href="/signup"
-                className="inline-block px-8 py-3 bg-[#2F6FED] hover:bg-[#2F6FED]/80 transition-all duration-300"
+                className="inline-block px-8 py-3 bg-primary-gradient rounded-xl transition-all duration-300 shadow-lg shadow-[#06b5cc]/10"
                 style={{
                   borderRadius: '9999px',
                   fontWeight: '600',
-                  boxShadow: '0 10px 30px rgba(47, 111, 237, 0.5)'
                 }}
               >
                 Get Started

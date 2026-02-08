@@ -1,14 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
-import { Check, X, Loader2, Crown, Sparkles } from 'lucide-react';
+import {
+  Check,
+  X,
+  Loader2,
+  Crown,
+  Sparkles
+} from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_BASE_URL } from '../../config/api';
-import { toast } from 'react-toastify';
+import StripeCheckoutForm from '../payment/StripeCheckoutForm';
+
+// Initialize Stripe
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+if (!stripePublicKey) {
+  console.error('VITE_STRIPE_PUBLISHABLE_KEY is not defined in your .env file');
+}
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : Promise.resolve(null);
 
 /**
  * Premium Pricing Page Component
- * Modern pricing UI with Paymob payment integration
+ * Modern pricing UI with Stripe payment integration
  * 
  * Features:
  * - Fetch pricing plans from backend
@@ -20,15 +37,16 @@ import { toast } from 'react-toastify';
 export default function PremiumPricingPage() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
-  
+
   // State management
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const [showIframe, setShowIframe] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState('');
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
   const [paymentId, setPaymentId] = useState(null);
+  const [showPaymentNotReadyModal, setShowPaymentNotReadyModal] = useState(false);
 
   // Fetch pricing plans on component mount
   useEffect(() => {
@@ -80,7 +98,7 @@ export default function PremiumPricingPage() {
 
   /**
    * Start payment process
-   * Calls backend API to initiate Paymob payment
+   * Calls backend API to initiate Stripe payment
    */
   const startPayment = async (plan) => {
     try {
@@ -97,11 +115,7 @@ export default function PremiumPricingPage() {
           planType: plan.type,
           planName: plan.name,
           amount: plan.price,
-          currency: plan.currency || 'EGP',
-          // Optional: Add phone, city, country if you have them
-          phone: user.phone || '+201000000000',
-          city: 'Cairo',
-          country: 'Egypt',
+          currency: plan.currency || 'USD',
         }),
       });
 
@@ -109,15 +123,15 @@ export default function PremiumPricingPage() {
 
       if (data.success) {
         console.log('Payment initiated:', data.data);
-        
+
         // Store payment ID for verification later
         setPaymentId(data.data.paymentId);
-        
-        // Open payment iframe
-        setIframeUrl(data.data.iframeUrl);
-        setShowIframe(true);
-        
-        toast.success('Payment initiated! Please complete the payment.');
+
+        // Store client secret for Stripe Elements
+        setClientSecret(data.data.clientSecret);
+        setShowCheckout(true);
+
+        toast.success('Payment initiated! Please complete the checkout.');
       } else {
         toast.error(data.message || 'Failed to start payment');
       }
@@ -130,14 +144,14 @@ export default function PremiumPricingPage() {
   };
 
   /**
-   * Close payment iframe
+   * Close checkout modal
    */
-  const closeIframe = () => {
-    setShowIframe(false);
-    setIframeUrl('');
+  const closeCheckout = () => {
+    setShowCheckout(false);
+    setClientSecret('');
     setSelectedPlan(null);
-    
-    // Optional: Verify payment status after closing
+
+    // Verify payment status after closing
     if (paymentId) {
       setTimeout(() => {
         verifyPayment(paymentId);
@@ -180,7 +194,7 @@ export default function PremiumPricingPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0E14] flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2F6FED] animate-spin" />
+        <Loader2 className="w-12 h-12 text-white animate-spin" />
       </div>
     );
   }
@@ -193,11 +207,11 @@ export default function PremiumPricingPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-16"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#2F6FED]/10 border border-[#2F6FED]/30 rounded-full mb-6">
-          <Sparkles className="w-4 h-4 text-[#2F6FED]" />
-          <span className="text-sm text-[#2F6FED] font-medium">Premium Plans</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#06b5cc]/10 border border-[#06b5cc]/30 rounded-full mb-6">
+          <Sparkles className="w-4 h-4 text-white" />
+          <span className="text-sm text-[#06b5cc] font-medium">Premium Plans</span>
         </div>
-        
+
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Choose Your Premium Plan
         </h1>
@@ -214,16 +228,15 @@ export default function PremiumPricingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`relative bg-[#0B1D34] border-2 rounded-2xl p-8 ${
-              plan.popular
-                ? 'border-[#2F6FED] shadow-2xl shadow-[#2F6FED]/20'
-                : 'border-white/10'
-            }`}
+            className={`relative bg-[#111113] border-2 rounded-2xl p-8 ${!!plan.popular
+              ? 'border-[#06b5cc] shadow-2xl shadow-[#06b5cc]/20'
+              : 'border-white/10 hover:border-white/20 shadow-xl shadow-black/50'
+              }`}
           >
             {/* Popular Badge */}
             {plan.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <div className="px-4 py-1 bg-gradient-to-r from-[#2F6FED] to-[#1F5FDD] text-white text-sm font-semibold rounded-full">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <div className="px-4 py-1 bg-gradient-to-r from-[#11282b] to-[#06b5cc] text-white text-sm font-semibold rounded-full">
                   Most Popular
                 </div>
               </div>
@@ -246,7 +259,7 @@ export default function PremiumPricingPage() {
                 <span className="text-xl text-[#94A3B8]">{plan.currency}</span>
               </div>
               <p className="text-sm text-[#94A3B8]">{plan.duration}</p>
-              
+
               {/* Savings Badge */}
               {plan.savings && (
                 <div className="inline-block mt-2 px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">
@@ -259,23 +272,21 @@ export default function PremiumPricingPage() {
             <div className="space-y-3 mb-8">
               {plan.features.map((feature, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 bg-[#2F6FED]/20 rounded-full flex items-center justify-center mt-0.5">
-                    <Check className="w-3 h-3 text-[#2F6FED]" />
+                  <div className="flex-shrink-0 w-5 h-5 bg-[#06b5cc]/20 rounded-full flex items-center justify-center mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
                   </div>
                   <span className="text-sm text-[#E2E8F0]">{feature}</span>
                 </div>
               ))}
             </div>
 
-            {/* CTA Button */}
             <button
               onClick={() => handleSelectPlan(plan)}
               disabled={processingPayment && selectedPlan?.id === plan.id}
-              className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-                plan.popular
-                  ? 'bg-gradient-to-r from-[#2F6FED] to-[#1F5FDD] text-white hover:shadow-lg hover:shadow-[#2F6FED]/50'
-                  : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${!!plan.popular
+                ? 'bg-gradient-to-r from-[#11282b] to-[#06b5cc] text-white hover:shadow-lg hover:shadow-[#06b5cc]/30'
+                : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {processingPayment && selectedPlan?.id === plan.id ? (
                 <>
@@ -293,36 +304,74 @@ export default function PremiumPricingPage() {
         ))}
       </div>
 
-      {/* Payment Iframe Modal */}
-      {showIframe && iframeUrl && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      {/* Stripe Checkout Modal */}
+      {showCheckout && clientSecret && createPortal(
+        <div className="checkout-portal-backdrop">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#0B1D34] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            className="bg-[#0B0B0D] border border-white/10 rounded-2xl w-full max-w-xl overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative max-h-[calc(100vh-120px)] flex flex-col my-auto md:my-0"
           >
+            {/* Background Effects (Reduced Opacity) */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#06b5cc]/10 rounded-full blur-[60px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#F7C94C]/5 rounded-full blur-[60px] pointer-events-none" />
+
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-lg font-semibold text-white">Complete Payment</h3>
+            <div className="flex items-center justify-between p-6 border-b border-white/5 relative z-10 bg-[#0B0B0D]">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#06b5cc]/10 flex items-center justify-center border border-[#06b5cc]/20">
+                    <Crown className="w-5 h-5 text-[#06b5cc]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white leading-tight">{selectedPlan?.name}</h3>
+                  </div>
+                  <div className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#06b5cc]/20 border border-[#06b5cc]/40 text-[#06b5cc] text-[10px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(6,181,204,0.3)] animate-pulse-subtle">
+                    <Crown className="w-4 h-4" />
+                    Premium Access
+                  </div>
+                </div>
+              </div>
               <button
-                onClick={closeIframe}
-                className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                onClick={closeCheckout}
+                className="p-2 hover:bg-white/10 rounded-xl transition-all border border-white/5 hover:border-white/20 group"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-[#94A3B8] group-hover:rotate-90 transition-transform duration-300 group-hover:text-white" />
               </button>
             </div>
 
-            {/* Iframe */}
-            <div className="relative h-[calc(90vh-80px)]">
-              <iframe
-                src={iframeUrl}
-                className="w-full h-full"
-                title="Payment Gateway"
-                frameBorder="0"
-              />
+            {/* Stripe Elements */}
+            <div className="p-6 overflow-y-auto max-h-[60vh] custom-scrollbar relative z-10">
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  clientSecret,
+                  appearance: {
+                    theme: 'night',
+                    labels: 'floating',
+                    variables: {
+                      colorPrimary: '#06b5cc',
+                      colorBackground: '#0A0A0B',
+                      colorText: '#ffffff',
+                      colorDanger: '#EF4444',
+                      fontFamily: 'Outfit, system-ui, sans-serif',
+                      spacingUnit: '4px',
+                      borderRadius: '12px',
+                    },
+                  }
+                }}
+              >
+                <StripeCheckoutForm
+                  amount={selectedPlan?.price}
+                  currency={selectedPlan?.currency || 'USD'}
+                  onCancel={closeCheckout}
+                />
+              </Elements>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Money Back Guarantee */}
@@ -333,7 +382,7 @@ export default function PremiumPricingPage() {
         className="mt-16 text-center"
       >
         <p className="text-[#94A3B8] text-sm">
-          🔒 Secure payment powered by Paymob • 💳 All payment methods accepted • 
+          🔒 Secure payment powered by Stripe • 💳 All payment methods accepted •
           ✨ Instant activation after payment
         </p>
       </motion.div>

@@ -23,7 +23,7 @@ export default function AIConfigPage() {
   const providers = [
     { value: 'openai', label: 'OpenAI', models: ['gpt-4', 'gpt-3.5-turbo'], color: 'green' },
     { value: 'anthropic', label: 'Anthropic (Claude)', models: ['claude-3-opus', 'claude-3-sonnet', 'claude-2'], color: 'orange' },
-    { value: 'mistral', label: 'Mistral AI', models: ['mistral-large', 'mistral-medium', 'mistral-small'], color: 'blue' },
+    { value: 'mistral', label: 'Mistral AI', models: ['mistral-large', 'mistral-medium', 'mistral-small'], color: 'cyan' },
     { value: 'groq', label: 'Groq', models: ['llama2-70b', 'mixtral-8x7b'], color: 'purple' }
   ];
 
@@ -129,7 +129,7 @@ export default function AIConfigPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Configuration Form */}
-          <div className="bg-[#0B1D34] border border-white/10 rounded-xl p-6">
+          <div className="bg-[#111113] border border-white/10 rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white mb-6">
               {selectedProvider ? 'Edit Provider' : 'Add New Provider'}
             </h2>
@@ -142,7 +142,7 @@ export default function AIConfigPage() {
                   onChange={(e) => selectProvider(e.target.value)}
                   required
                   disabled={selectedProvider}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] disabled:opacity-50 transition-all"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] disabled:opacity-50 transition-all"
                 >
                   <option value="">Select Provider</option>
                   {providers.map(p => (
@@ -161,7 +161,7 @@ export default function AIConfigPage() {
                       onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
                       required
                       placeholder="Enter API key"
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] transition-all placeholder:text-[#94A3B8]"
                     />
                   </div>
 
@@ -171,7 +171,7 @@ export default function AIConfigPage() {
                       value={formData.model}
                       onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                       required
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] transition-all"
                     >
                       {providers.find(p => p.value === formData.provider)?.models.map(model => (
                         <option key={model} value={model}>{model}</option>
@@ -188,7 +188,7 @@ export default function AIConfigPage() {
                         onChange={(e) => setFormData({ ...formData, maxTokens: parseInt(e.target.value) })}
                         min="100"
                         max="10000"
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] transition-all"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] transition-all"
                       />
                     </div>
 
@@ -201,7 +201,7 @@ export default function AIConfigPage() {
                         min="0"
                         max="2"
                         step="0.1"
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] transition-all"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] transition-all"
                       />
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export default function AIConfigPage() {
                       onChange={(e) => setFormData({ ...formData, systemPrompt: e.target.value })}
                       rows="4"
                       placeholder="Enter system prompt for the AI..."
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#2F6FED] transition-all placeholder:text-[#94A3B8]"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#06b5cc] transition-all placeholder:text-[#94A3B8]"
                     />
                   </div>
 
@@ -223,7 +223,7 @@ export default function AIConfigPage() {
                         type="checkbox"
                         checked={formData.isEnabled}
                         onChange={(e) => setFormData({ ...formData, isEnabled: e.target.checked })}
-                        className="w-5 h-5 text-[#2F6FED] rounded"
+                        className="w-5 h-5 text-[#06b5cc] rounded"
                       />
                       <span className="text-sm font-medium text-white">Enable this provider</span>
                     </label>
@@ -232,7 +232,7 @@ export default function AIConfigPage() {
                         type="checkbox"
                         checked={formData.isDefault}
                         onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                        className="w-5 h-5 text-[#2F6FED] rounded"
+                        className="w-5 h-5 text-[#06b5cc] rounded"
                       />
                       <span className="text-sm font-medium text-white">Set as default provider</span>
                     </label>
@@ -248,7 +248,7 @@ export default function AIConfigPage() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2F6FED] hover:bg-[#2F6FED]/80 text-white rounded-lg transition-colors font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#06b5cc] hover:bg-[#06b5cc]/80 text-white rounded-lg transition-colors font-medium"
                     >
                       <Save className="w-5 h-5" />
                       Save Configuration
@@ -262,13 +262,13 @@ export default function AIConfigPage() {
           {/* Existing Providers */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-white">Configured Providers</h2>
-            
+
             {loading ? (
               <div className="text-center py-12 text-[#94A3B8]">
                 Loading configurations...
               </div>
             ) : configs.length === 0 ? (
-              <div className="bg-[#0B1D34] rounded-xl border border-white/10 p-12 text-center">
+              <div className="bg-[#111113] rounded-xl border border-white/10 p-12 text-center">
                 <Bot className="w-12 h-12 text-[#94A3B8] mx-auto mb-4" />
                 <p className="text-[#94A3B8]">No AI providers configured yet</p>
               </div>
@@ -276,32 +276,30 @@ export default function AIConfigPage() {
               configs.map((config) => (
                 <div
                   key={config._id}
-                  className={`bg-[#0B1D34] rounded-xl border p-6 hover:border-white/20 transition-all ${
-                    config.isDefault ? 'border-[#2F6FED] ring-2 ring-[#2F6FED]/20' : 'border-white/10'
-                  }`}
+                  className={`bg-[#111113] rounded-xl border p-6 hover:border-white/20 transition-all ${config.isDefault ? 'border-[#06b5cc] ring-2 ring-[#06b5cc]/20' : 'border-white/10'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-[#2F6FED]/10 rounded-lg flex items-center justify-center">
-                        <Bot className="w-6 h-6 text-[#2F6FED]" />
+                      <div className="w-12 h-12 bg-[#06b5cc]/10 rounded-lg flex items-center justify-center">
+                        <Bot className="w-6 h-6 text-[#06b5cc]" />
                       </div>
                       <div>
                         <h3 className="text-base font-semibold text-white">{config.displayName}</h3>
                         <p className="text-sm text-[#94A3B8]">{config.model}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-2">
                       {config.isDefault && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#2F6FED]/10 text-[#2F6FED] border border-[#2F6FED]/30">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#06b5cc]/10 text-[#06b5cc] border border-[#06b5cc]/30">
                           Default
                         </span>
                       )}
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        config.isEnabled 
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                          : 'bg-white/5 text-[#94A3B8] border border-white/10'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.isEnabled
+                        ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                        : 'bg-white/5 text-[#94A3B8] border border-white/10'
+                        }`}>
                         {config.isEnabled ? 'Enabled' : 'Disabled'}
                       </span>
                     </div>
@@ -334,7 +332,7 @@ export default function AIConfigPage() {
                     {!config.isDefault && config.isEnabled && (
                       <button
                         onClick={() => handleSetDefault(config.provider)}
-                        className="flex-1 px-4 py-2 bg-[#2F6FED]/10 text-[#2F6FED] hover:bg-[#2F6FED]/20 rounded-lg transition-colors text-sm font-medium"
+                        className="flex-1 px-4 py-2 bg-[#06b5cc]/10 text-[#06b5cc] hover:bg-[#06b5cc]/20 rounded-lg transition-colors text-sm font-medium"
                       >
                         Set Default
                       </button>

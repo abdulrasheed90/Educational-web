@@ -15,7 +15,7 @@ class PaymentService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Get plans error:', error);
+      logger.error('Get plans error:', error);
       throw error;
     }
   }
@@ -36,7 +36,7 @@ class PaymentService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Start payment error:', error);
+      logger.error('Start payment error:', error);
       throw error;
     }
   }
@@ -57,7 +57,7 @@ class PaymentService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Get history error:', error);
+      logger.error('Get history error:', error);
       throw error;
     }
   }
@@ -75,7 +75,7 @@ class PaymentService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Get payment details error:', error);
+      logger.error('Get payment details error:', error);
       throw error;
     }
   }
@@ -98,7 +98,7 @@ class PaymentService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Verify payment error:', error);
+      logger.error('Verify payment error:', error);
       throw error;
     }
   }

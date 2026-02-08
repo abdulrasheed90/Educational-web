@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Ban, CheckCircle, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import AdminLayout from '../../admin/AdminLayout';
 import { getAllUsers, createUser, updateUser, deleteUser, toggleUserBan } from '../../../services/adminService';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -20,6 +21,7 @@ export default function UsersPage() {
     role: 'user',
     isPremium: false
   });
+  const { confirm, ConfirmComponent } = useConfirm();
 
   useEffect(() => {
     fetchUsers();
@@ -59,12 +61,19 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(id);
-        toast.success('User deleted successfully');
-        fetchUsers();
-      } catch (error) {
+    try {
+      await confirm({
+        title: 'Delete User',
+        message: 'Are you sure you want to delete this user? This action cannot be undone.',
+        variant: 'danger',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      await deleteUser(id);
+      toast.success('User deleted successfully');
+      fetchUsers();
+    } catch (error) {
+      if (error !== false) {
         toast.error('Failed to delete user');
       }
     }
@@ -114,7 +123,7 @@ export default function UsersPage() {
           </div>
           <button
             onClick={() => { resetForm(); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add User
@@ -145,7 +154,7 @@ export default function UsersPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-[#0B1D34] border border-white/10 rounded-2xl overflow-hidden">
+        <div className="bg-[#06b5cc] border border-white/10 rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-white/5 border-b border-white/10">
@@ -177,11 +186,10 @@ export default function UsersPage() {
                       <td className="px-6 py-4 text-white">{user.name}</td>
                       <td className="px-6 py-4 text-[#94A3B8]">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          user.role === 'admin' 
-                            ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' 
-                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
+                          ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          : 'bg-[#06b5cc]/10 text-[#06b5cc] border border-[#06b5cc]/20'
+                          }`}>
                           {user.role}
                         </span>
                       </td>
@@ -206,7 +214,7 @@ export default function UsersPage() {
                             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
                             title="Edit"
                           >
-                            <Edit className="w-4 h-4 text-blue-400" />
+                            <Edit className="w-4 h-4 text-[#06b5cc]" />
                           </button>
                           <button
                             onClick={() => handleToggleBan(user._id)}
@@ -259,7 +267,7 @@ export default function UsersPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-[#0B1D34] to-[#0B1D34]/90 border border-white/10 rounded-2xl p-6 w-full max-w-md">
+          <div className="bg-gradient-to-br from-[#111113] to-[#111113]/90 border border-white/10 rounded-2xl p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
                 {editingUser ? 'Edit User' : 'Add New User'}
@@ -277,7 +285,7 @@ export default function UsersPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -288,7 +296,7 @@ export default function UsersPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -301,7 +309,7 @@ export default function UsersPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required={!editingUser}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 />
               </div>
 
@@ -310,7 +318,7 @@ export default function UsersPage() {
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#2F6FED]"
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-[#06b5cc]"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -340,7 +348,7 @@ export default function UsersPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#2F6FED] hover:bg-[#2F6FED]/80 rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-[#06b5cc] hover:bg-[#06b5cc]/80 rounded-xl transition-colors"
                 >
                   {editingUser ? 'Update' : 'Create'}
                 </button>
@@ -349,6 +357,7 @@ export default function UsersPage() {
           </div>
         </div>
       )}
+      <ConfirmComponent />
     </AdminLayout>
   );
 }

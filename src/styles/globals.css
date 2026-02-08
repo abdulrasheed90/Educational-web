@@ -242,10 +242,10 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2F6FED;
+  background: #06b5cc;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A9C7FF;
+  background: #EADADA;
 }
